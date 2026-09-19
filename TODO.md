@@ -17,12 +17,12 @@
 ## 1. CRUD Parcelle (en cours)
 
 - [x] **GET `/api/parcelles`** — lister toutes les parcelles (`prisma.parcelle.findMany()`)
-- [ ] **GET `/api/parcelles/[id]`** — récupérer une seule parcelle (`prisma.parcelle.findUnique()`), notion à apprendre : les routes dynamiques Next.js (dossier `[id]`)
-- [ ] **PUT `/api/parcelles/[id]`** — modifier une parcelle (`prisma.parcelle.update()`)
-- [ ] **DELETE `/api/parcelles/[id]`** — supprimer une parcelle (`prisma.parcelle.delete()`)
-- [ ] Tester les 4 routes dans Postman avant de passer à l'interface
-- [ ] **Formulaire React** : page `app/parcelles/page.tsx` avec liste des parcelles (fetch GET) + bouton supprimer
-- [ ] **Formulaire d'ajout** : `app/parcelles/ajouter/page.tsx`, avec `useState` par champ + `fetch` en POST vers l'API
+- [x] **GET `/api/parcelles/[id]`** — récupérer une seule parcelle (`prisma.parcelle.findUnique()`), notion à apprendre : les routes dynamiques Next.js (dossier `[id]`)
+- [x] **PUT `/api/parcelles/[id]`** — modifier une parcelle (`prisma.parcelle.update()`)
+- [x] **DELETE `/api/parcelles/[id]`** — supprimer une parcelle (`prisma.parcelle.delete()`)
+- [x] Tester les 4 routes dans Postman avant de passer à l'interface
+- [x] **Formulaire React** : page `app/parcelles/page.tsx` avec liste des parcelles (fetch GET) + bouton supprimer
+- [x] **Formulaire d'ajout** : `app/parcelles/ajouter/page.tsx`, avec `useState` par champ + `fetch` en POST vers l'API
 - [ ] **Formulaire de modification** : réutiliser la même logique, pré-remplie avec les données existantes
 - [ ] Commit Git : `"CRUD Parcelle complet"`
 
