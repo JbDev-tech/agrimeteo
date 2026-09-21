@@ -1,20 +1,25 @@
 'use client'
+import { Parcelle } from "@/app/generated/prisma/client";
 import { useState } from "react";
 
 
-export  function ParcellesForm(){
+export  function ParcellesForm({parcelle} : {parcelle?: Parcelle}){
 
-    const [nom ,setNom] = useState('')
-    const [latitude, setLatitude] = useState('')
-    const [longitude, setLongitude] = useState('')
-    const [superficie, setSuperficie] = useState('')
+    
+    const [nom, setNom] = useState(parcelle?.nom || '')
+    const [latitude, setLatitude] = useState(parcelle?.latitude?.toString() || '')
+    const [longitude, setLongitude] = useState(parcelle?.longitude?.toString() || '')
+    const [superficie, setSuperficie] = useState(parcelle?.superficie?.toString() || '')
 
 
     async function handleSubmit(e: React.SubmitEvent) {
-  e.preventDefault()
+    e.preventDefault()
 
-  await fetch('/api/parcelles', {
-    method: 'POST',
+    const url = parcelle ?`/api/parcelles/${parcelle.id}`:`/api/parcelles`
+    const method = parcelle ? 'PUT' : 'POST'
+
+  await fetch(url, {
+    method: method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 
         nom, 
