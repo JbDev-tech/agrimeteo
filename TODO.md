@@ -23,14 +23,14 @@
 - [x] Tester les 4 routes dans Postman avant de passer à l'interface
 - [x] **Formulaire React** : page `app/parcelles/page.tsx` avec liste des parcelles (fetch GET) + bouton supprimer
 - [x] **Formulaire d'ajout** : `app/parcelles/ajouter/page.tsx`, avec `useState` par champ + `fetch` en POST vers l'API
-- [ ] **Formulaire de modification** : réutiliser la même logique, pré-remplie avec les données existantes
-- [ ] Commit Git : `"CRUD Parcelle complet"`
+- [x] **Formulaire de modification** : réutiliser la même logique, pré-remplie avec les données existantes
+- [x] Commit Git : `"CRUD Parcelle complet"`
 
 ---
 
 ## 2. CRUD Culture + CycleCulture
 
-- [ ] Routes `POST`/`GET`/`PUT`/`DELETE` pour `Culture` (nom, type — table simple, sans relation entrante)
+- [x] Routes `POST`/`GET`/`PUT`/`DELETE` pour `Culture` (nom, type — table simple, sans relation entrante)
 - [ ] Routes pour `CycleCulture` : créer un cycle = choisir une parcelle existante + une culture existante + une date de plantation
 - [ ] Notion à apprendre : requêtes Prisma avec relations (`include`) pour afficher, par exemple, le nom de la culture ET le nom de la parcelle sur un même cycle
 - [ ] Interface : formulaire de "plantation" (sélectionner parcelle + culture dans des `<select>`, remplis depuis la base)
