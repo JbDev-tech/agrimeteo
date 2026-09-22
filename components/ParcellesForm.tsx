@@ -18,16 +18,16 @@ export  function ParcellesForm({parcelle} : {parcelle?: Parcelle}){
     const url = parcelle ?`/api/parcelles/${parcelle.id}`:`/api/parcelles`
     const method = parcelle ? 'PUT' : 'POST'
 
-  await fetch(url, {
-    method: method,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-        nom, 
-        latitude : Number(latitude), 
-        longitude: Number(longitude), 
-        superficie: Number(superficie)
-     })
-  })
+    await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            nom, 
+            latitude : Number(latitude), 
+            longitude: Number(longitude), 
+            superficie: Number(superficie)
+        })
+    })
 }
 
     return(
