@@ -1,55 +1,72 @@
-//GET pour la récupération d'une seule relevé
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { getUser } from "@/lib/auth";
+import { cycleAppartient, releveAppartient } from "@/lib/acces";
 
-import { prisma } from "@/lib/prisma"
-import { NextResponse } from "next/server"
+type Ctx = { params: Promise<{ id: string }> };
 
-export async function GET(REQUEST:Request, {params} : {params : Promise<{id :string}>}) {
-    try{
-        const {id} = await params
-        const releve = await prisma.releve.findUnique({
-            where : {id : Number(id)}
-        })
+export async function GET(request: Request, { params }: Ctx) {
+  try {
+    const user = await getUser();
+    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
 
-        return NextResponse.json(releve)
-    }catch(error){
-        console.error(error)
-        return NextResponse.json({error:"Error lors de la l'affichage du relevé"},{status:500})
-    }
+    const releve = await releveAppartient(Number((await params).id), user.id);
+    if (!releve) return NextResponse.json({ error: "Relevé introuvable" }, { status: 404 });
+    return NextResponse.json(releve);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Erreur lors de l'affichage du relevé" }, { status: 500 });
+  }
 }
 
-//PUT pour la modification 'une seule releve
+export async function PUT(request: Request, { params }: Ctx) {
+  try {
+    const user = await getUser();
+    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
 
-export async function PUT(REQUEST:Request, {params} : {params : Promise<{id : string}>}) {
-    try{
-        const body = await REQUEST.json()
-        const {id} = await params
-        const releve = await prisma.releve.update({
-            where : {id : Number(id)},
-            data:{
-                date : new Date(body.date),
-                observation : body.observation,
-                stade_croissance : body.stade_croissance,
-                cycleCultureId  : body.cycleCultureId 
-            }
-        })
-        return NextResponse.json(releve)
-    }catch(error){
-        console.error(error)
-        return NextResponse.json({error:"Erreur lors de la modification"},{status:500})
+    const id = Number((await params).id);
+    if (!(await releveAppartient(id, user.id))) {
+      return NextResponse.json({ error: "Relevé introuvable" }, { status: 404 });
     }
+
+    const body = await request.json();
+    const cycleCultureId = Number(body.cycleCultureId);
+
+    // Le nouveau cycle choisi doit aussi appartenir à l'utilisateur
+    if (!(await cycleAppartient(cycleCultureId, user.id))) {
+      return NextResponse.json({ error: "Cycle introuvable" }, { status: 404 });
+    }
+
+    const releve = await prisma.releve.update({
+      where: { id },
+      data: {
+        date: new Date(body.date),
+        observation: body.observation ?? "",
+        stade_croissance: body.stade_croissance,
+        cycleCultureId,
+      },
+    });
+    return NextResponse.json(releve);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Erreur lors de la modification" }, { status: 500 });
+  }
 }
 
-//delete pour la suppression
+export async function DELETE(request: Request, { params }: Ctx) {
+  try {
+    const user = await getUser();
+    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
 
-export async function DELETE(REQUEST:Request, {params} : {params : Promise<{id : string}>}) {
-    try{
-        const {id} = await params
-        const releve = await prisma.releve.delete({
-            where : {id : Number(id)}
-        })
-        return NextResponse.json(releve)
-    }catch(error){
-        console.error(error)
-        return NextResponse.json({error:"Error lors de la suppression"},{status:500})
+    const id = Number((await params).id);
+    if (!(await releveAppartient(id, user.id))) {
+      return NextResponse.json({ error: "Relevé introuvable" }, { status: 404 });
     }
+
+    const releve = await prisma.releve.delete({ where: { id } });
+    return NextResponse.json(releve);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Erreur lors de la suppression" }, { status: 500 });
+  }
 }

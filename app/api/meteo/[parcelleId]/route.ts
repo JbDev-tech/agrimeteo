@@ -1,21 +1,22 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { getUser } from "@/lib/auth";
 
 export async function GET(
-  REQUEST: Request,
+  request: Request,
   { params }: { params: Promise<{ parcelleId: string }> },
 ) {
   try {
+    const user = await getUser();
+    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
+
     const { parcelleId } = await params;
 
-    const parcelle = await prisma.parcelle.findUnique({
-      where: { id: Number(parcelleId) },
+    const parcelle = await prisma.parcelle.findFirst({
+      where: { id: Number(parcelleId), userId: user.id },
     });
     if (!parcelle) {
-      return NextResponse.json(
-        { error: "Erreur de parcelle" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Parcelle introuvable" }, { status: 404 });
     }
 
     const apiKey = process.env.OPENWEATHER_API_KEY;
@@ -26,7 +27,7 @@ export async function GET(
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${parcelle.latitude}&lon=${parcelle.longitude}&appid=${apiKey}&units=metric&lang=fr`;
 
     const response = await fetch(url, {
-      next: { revalidate: 900 }, // <- cache en 15 min
+      next: { revalidate: 900 }, // cache de 15 min
     });
 
     if (!response.ok) {

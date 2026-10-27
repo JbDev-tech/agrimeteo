@@ -22,6 +22,9 @@ model Parcelle {
   cycles CycleCulture[]
   meteo Meteo[]
   conseils  Conseil[]
+  
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id])
 }
 
 model Culture {
@@ -29,6 +32,8 @@ model Culture {
   nom  String
   type String
 
+  userId Int?
+  user   User? @relation(fields: [userId], references:[id])
   cycles  CycleCulture[]
 }
 
@@ -78,4 +83,13 @@ model Conseil {
 
   parcelleId Int
   parcelle   Parcelle @relation(fields: [parcelleId], references: [id])
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  nom        String
+  email      String     @unique
+  motDePasse String
+  cultures   Culture[]
+  parcelles  Parcelle[]
 }

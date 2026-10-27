@@ -1,17 +1,26 @@
-//Ajouter ou crée (POST)
-
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { getUser } from "@/lib/auth";
+import { validerParcelle } from "@/lib/validation";
 
-export async function POST(REQUEST: Request) {
+export async function POST(request: Request) {
   try {
-    const body = await REQUEST.json();
+    const user = await getUser();
+    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
+
+    const body = await request.json();
+    const messageErreur = validerParcelle(body);
+    if (messageErreur) {
+      return NextResponse.json({ error: messageErreur }, { status: 400 });
+    }
+
     const parcelle = await prisma.parcelle.create({
       data: {
-        nom: body.nom,
-        latitude: body.latitude,
-        longitude: body.longitude,
-        superficie: body.superficie,
+        nom: String(body.nom).trim(),
+        latitude: Number(body.latitude),
+        longitude: Number(body.longitude),
+        superficie: Number(body.superficie),
+        userId: user.id,
       },
     });
     return NextResponse.json({ parcelle }, { status: 201 });
@@ -24,11 +33,15 @@ export async function POST(REQUEST: Request) {
   }
 }
 
-//Maintenant GET pour la lecture
-
-export async function GET(REQUEST: Request) {
+export async function GET() {
   try {
-    const parcelles = await prisma.parcelle.findMany();
+    const user = await getUser();
+    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
+
+    const parcelles = await prisma.parcelle.findMany({
+      where: { userId: user.id },
+      orderBy: { id: "asc" },
+    });
     return NextResponse.json(parcelles);
   } catch (error) {
     console.error(error);
