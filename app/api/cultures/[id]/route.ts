@@ -1,68 +1,85 @@
-import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
-import { cultureAppartient } from "@/lib/acces";
+import { prisma } from "@/lib/prisma";
+import { validerCulture } from "@/lib/validation";
 
-type Ctx = { params: Promise<{ id: string }> };
+type Contexte = { params: Promise<{ id: string }> };
 
-export async function GET(request: Request, { params }: Ctx) {
-  try {
-    const user = await getUser();
-    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
-
-    const culture = await cultureAppartient(Number((await params).id), user.id);
-    if (!culture) return NextResponse.json({ error: "Culture introuvable" }, { status: 404 });
-    return NextResponse.json(culture);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Erreur lors de l'affichage de la culture" }, { status: 500 });
+async function trouver(contexte: Contexte) {
+  const user = await getUser();
+  if (!user) {
+    return { reponse: NextResponse.json({ error: "Non connecté" }, { status: 401 }) };
   }
+
+  const { id } = await contexte.params;
+  const cultureId = Number(id);
+  if (!Number.isInteger(cultureId)) {
+    return { reponse: NextResponse.json({ error: "Identifiant invalide" }, { status: 400 }) };
+  }
+
+  const culture = await prisma.culture.findFirst({
+    where: { id: cultureId, userId: user.id },
+  });
+  if (!culture) {
+    return { reponse: NextResponse.json({ error: "Culture introuvable" }, { status: 404 }) };
+  }
+
+  return { user, culture };
 }
 
-export async function PUT(request: Request, { params }: Ctx) {
-  try {
-    const user = await getUser();
-    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
-
-    const id = Number((await params).id);
-    if (!(await cultureAppartient(id, user.id))) {
-      return NextResponse.json({ error: "Culture introuvable" }, { status: 404 });
-    }
-
-    const body = await request.json();
-    const culture = await prisma.culture.update({
-      where: { id },
-      data: { nom: body.nom, type: body.type },
-    });
-    return NextResponse.json(culture);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Erreur lors de la modification" }, { status: 500 });
-  }
+export async function GET(_req: Request, contexte: Contexte) {
+  const r = await trouver(contexte);
+  if (r.reponse) return r.reponse;
+  return NextResponse.json(r.culture);
 }
 
-export async function DELETE(request: Request, { params }: Ctx) {
-  try {
-    const user = await getUser();
-    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
+export async function PUT(req: Request, contexte: Contexte) {
+  const r = await trouver(contexte);
+  if (r.reponse) return r.reponse;
 
-    const id = Number((await params).id);
-    if (!(await cultureAppartient(id, user.id))) {
-      return NextResponse.json({ error: "Culture introuvable" }, { status: 404 });
-    }
-
-    const nbCycles = await prisma.cycleCulture.count({ where: { cultureId: id } });
-    if (nbCycles > 0) {
-      return NextResponse.json(
-        { error: "Cette culture est utilisée par un cycle : supprimez d'abord le cycle" },
-        { status: 409 },
-      );
-    }
-
-    const culture = await prisma.culture.delete({ where: { id } });
-    return NextResponse.json(culture);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Erreur lors de la suppression de la culture" }, { status: 500 });
+  const corps = await req.json().catch(() => null);
+  if (!corps) {
+    return NextResponse.json({ error: "Données invalides" }, { status: 400 });
   }
+
+  const erreur = validerCulture({ nom: corps.nom, type: corps.type });
+  if (erreur) {
+    return NextResponse.json({ error: erreur }, { status: 400 });
+  }
+
+  const nom = String(corps.nom).trim();
+
+  const doublon = await prisma.culture.findFirst({
+    where: { userId: r.user!.id, nom, NOT: { id: r.culture!.id } },
+  });
+  if (doublon) {
+    return NextResponse.json({ error: `Vous avez déjà une culture « ${nom} ».` }, { status: 409 });
+  }
+
+  const culture = await prisma.culture.update({
+    where: { id: r.culture!.id },
+    data: { nom, type: corps.type },
+  });
+
+  return NextResponse.json(culture);
+}
+
+export async function DELETE(_req: Request, contexte: Contexte) {
+  const r = await trouver(contexte);
+  if (r.reponse) return r.reponse;
+
+  const nbCycles = await prisma.cycleCulture.count({
+    where: { cultureId: r.culture!.id },
+  });
+  if (nbCycles > 0) {
+    return NextResponse.json(
+      {
+        error: `Cette culture est utilisée par ${nbCycles} cycle${nbCycles > 1 ? "s" : ""}. Supprimez d'abord ces cycles.`,
+      },
+      { status: 409 },
+    );
+  }
+
+  await prisma.culture.delete({ where: { id: r.culture!.id } });
+  return NextResponse.json({ ok: true });
 }

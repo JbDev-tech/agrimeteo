@@ -2,7 +2,14 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { getUser } from "@/lib/auth";
-import { Sidebar } from "@/components/Sidebar";
+import Sidebar from "@/components/Sidebar";
+import { Figtree } from "next/font/google";
+
+
+const figtree = Figtree({
+  subsets: ["latin"],
+  variable: "--font-figtree",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +23,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "AgriMétéo",
-  description: "Suivi de cultures agricoles avec météo et conseils",
+  description: "La météo de vos parcelles et des conseils adaptés à vos cultures.",
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
@@ -27,16 +34,16 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       lang="fr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-gray-50">
-        {user ? (
-          <div className="flex min-h-screen">
-            <Sidebar nom={user.nom} />
-            <main className="flex-1 min-w-0 pb-20 md:pb-0">{children}</main>
-          </div>
-        ) : (
-          children
-        )}
-      </body>
+<body className={`${figtree.variable} antialiased`}>
+  {user ? (
+    <div className="flex min-h-screen">
+      <Sidebar nom={user.nom} />
+      <main className="min-w-0 flex-1 pb-24 md:pb-0">{children}</main>
+    </div>
+  ) : (
+    children
+  )}
+</body>
     </html>
   );
 }

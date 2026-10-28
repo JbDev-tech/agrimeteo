@@ -58,6 +58,7 @@ model CycleCulture {
   parcelle Parcelle @relation(fields: [parcelleId], references: [id])
 
   culture Culture @relation(fields: [cultureId],references: [id])
+  conseils Conseil[]
 
   releves       Releve[]
 }
@@ -83,6 +84,9 @@ model Conseil {
 
   parcelleId Int
   parcelle   Parcelle @relation(fields: [parcelleId], references: [id])
+  
+  cycleCultureId Int?
+  cycleCulture   CycleCulture? @relation(fields: [cycleCultureId], references: [id], onDelete: Cascade)
 }
 
 model User {

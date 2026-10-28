@@ -1,61 +1,61 @@
-import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
-import { parcelleAppartient, cultureAppartient } from "@/lib/acces";
-
-export async function POST(request: Request) {
-  try {
-    const user = await getUser();
-    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
-
-    const body = await request.json();
-    const parcelleId = Number(body.parcelleId);
-    const cultureId = Number(body.cultureId);
-
-    if (!body.date_plantation || !parcelleId || !cultureId) {
-      return NextResponse.json(
-        { error: "Parcelle, culture et date de plantation requises" },
-        { status: 400 },
-      );
-    }
-
-    // La parcelle ET la culture doivent appartenir à l'utilisateur
-    const [parcelle, culture] = await Promise.all([
-      parcelleAppartient(parcelleId, user.id),
-      cultureAppartient(cultureId, user.id),
-    ]);
-    if (!parcelle || !culture) {
-      return NextResponse.json({ error: "Parcelle ou culture introuvable" }, { status: 404 });
-    }
-
-    const cycle = await prisma.cycleCulture.create({
-      data: {
-        date_plantation: new Date(body.date_plantation),
-        date_recolte: body.date_recolte ? new Date(body.date_recolte) : null,
-        parcelleId,
-        cultureId,
-      },
-    });
-    return NextResponse.json(cycle, { status: 201 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Erreur lors de la création du cycle" }, { status: 500 });
-  }
-}
+import { prisma } from "@/lib/prisma";
+import { validerCycle } from "@/lib/validation";
 
 export async function GET() {
-  try {
-    const user = await getUser();
-    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
-
-    const cycles = await prisma.cycleCulture.findMany({
-      where: { parcelle: { userId: user.id } },
-      include: { parcelle: true, culture: true },
-      orderBy: { date_plantation: "desc" },
-    });
-    return NextResponse.json(cycles);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Erreur lors de l'affichage des cycles" }, { status: 500 });
+  const user = await getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Non connecté" }, { status: 401 });
   }
+
+  const cycles = await prisma.cycleCulture.findMany({
+    where: { parcelle: { userId: user.id } },
+    orderBy: { date_plantation: "desc" },
+    include: { parcelle: true, culture: true },
+  });
+
+  return NextResponse.json(cycles);
+}
+
+export async function POST(req: Request) {
+  const user = await getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Non connecté" }, { status: 401 });
+  }
+
+  const corps = await req.json().catch(() => null);
+  if (!corps) {
+    return NextResponse.json({ error: "Données invalides" }, { status: 400 });
+  }
+
+  const erreur = validerCycle({
+    parcelleId: corps.parcelleId,
+    cultureId: corps.cultureId,
+    date_plantation: corps.date_plantation,
+    date_recolte: corps.date_recolte,
+  });
+  if (erreur) {
+    return NextResponse.json({ error: erreur }, { status: 400 });
+  }
+
+  const [parcelle, culture] = await Promise.all([
+    prisma.parcelle.findFirst({ where: { id: corps.parcelleId, userId: user.id } }),
+    prisma.culture.findFirst({ where: { id: corps.cultureId, userId: user.id } }),
+  ]);
+
+  if (!parcelle || !culture) {
+    return NextResponse.json({ error: "Parcelle ou culture introuvable" }, { status: 404 });
+  }
+
+  const cycle = await prisma.cycleCulture.create({
+    data: {
+      parcelleId: parcelle.id,
+      cultureId: culture.id,
+      date_plantation: new Date(corps.date_plantation),
+      date_recolte: corps.date_recolte ? new Date(corps.date_recolte) : null,
+    },
+  });
+
+  return NextResponse.json(cycle, { status: 201 });
 }

@@ -1,21 +1,34 @@
-import { notFound } from "next/navigation"
-import { ParcellesForm } from "@/components/ParcellesForm"
-import { exigerUser } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { notFound } from "next/navigation";
+import { exigerUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import ParcellesForm from "@/components/ParcellesForm";
 
-export default async function ModifierParcellePage({ params }: { params: Promise<{ id: string }> }) {
-  const user = await exigerUser()
-  const { id } = await params
+export default async function ModifierParcellePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const user = await exigerUser();
+  const { id } = await params;
+  const parcelleId = Number(id);
+
+  if (!Number.isInteger(parcelleId)) notFound();
 
   const parcelle = await prisma.parcelle.findFirst({
-    where: { id: Number(id), userId: user.id },
-  })
-  if (!parcelle) notFound()
+    where: { id: parcelleId, userId: user.id },
+  });
+
+  if (!parcelle) notFound();
 
   return (
-    <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold">Modifier la parcelle</h1>
-      <ParcellesForm parcelle={parcelle} />
-    </div>
-  )
+    <ParcellesForm
+      parcelle={{
+        id: parcelle.id,
+        nom: parcelle.nom,
+        latitude: parcelle.latitude,
+        longitude: parcelle.longitude,
+        superficie: parcelle.superficie,
+      }}
+    />
+  );
 }

@@ -1,10 +1,20 @@
-import { ParcellesForm } from "@/components/ParcellesForm"
+import { exigerUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import ParcellesForm from "@/components/ParcellesForm";
 
-export default function AjouterParcellePage() {
+export default async function AjouterParcellePage() {
+  const user = await exigerUser();
+
+  const cultures = await prisma.culture.findMany({
+    where: { userId: user.id },
+    orderBy: { nom: "asc" },
+    select: { id: true, nom: true },
+  });
+
   return (
-    <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold">Ajouter une parcelle</h1>
-      <ParcellesForm />
-    </div>
-  )
+    <ParcellesForm
+      cultures={cultures}
+      dateParDefaut={new Date().toISOString().slice(0, 10)}
+    />
+  );
 }

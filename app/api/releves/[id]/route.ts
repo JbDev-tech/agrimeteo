@@ -1,72 +1,81 @@
-import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
-import { cycleAppartient, releveAppartient } from "@/lib/acces";
+import { prisma } from "@/lib/prisma";
+import { validerReleve } from "@/lib/validation";
 
-type Ctx = { params: Promise<{ id: string }> };
+type Contexte = { params: Promise<{ id: string }> };
 
-export async function GET(request: Request, { params }: Ctx) {
-  try {
-    const user = await getUser();
-    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
-
-    const releve = await releveAppartient(Number((await params).id), user.id);
-    if (!releve) return NextResponse.json({ error: "Relevé introuvable" }, { status: 404 });
-    return NextResponse.json(releve);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Erreur lors de l'affichage du relevé" }, { status: 500 });
+async function trouver(contexte: Contexte) {
+  const user = await getUser();
+  if (!user) {
+    return { reponse: NextResponse.json({ error: "Non connecté" }, { status: 401 }) };
   }
+
+  const { id } = await contexte.params;
+  const releveId = Number(id);
+  if (!Number.isInteger(releveId)) {
+    return { reponse: NextResponse.json({ error: "Identifiant invalide" }, { status: 400 }) };
+  }
+
+  const releve = await prisma.releve.findFirst({
+    where: { id: releveId, cycleCulture: { parcelle: { userId: user.id } } },
+  });
+  if (!releve) {
+    return { reponse: NextResponse.json({ error: "Relevé introuvable" }, { status: 404 }) };
+  }
+
+  return { user, releve };
 }
 
-export async function PUT(request: Request, { params }: Ctx) {
-  try {
-    const user = await getUser();
-    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
-
-    const id = Number((await params).id);
-    if (!(await releveAppartient(id, user.id))) {
-      return NextResponse.json({ error: "Relevé introuvable" }, { status: 404 });
-    }
-
-    const body = await request.json();
-    const cycleCultureId = Number(body.cycleCultureId);
-
-    // Le nouveau cycle choisi doit aussi appartenir à l'utilisateur
-    if (!(await cycleAppartient(cycleCultureId, user.id))) {
-      return NextResponse.json({ error: "Cycle introuvable" }, { status: 404 });
-    }
-
-    const releve = await prisma.releve.update({
-      where: { id },
-      data: {
-        date: new Date(body.date),
-        observation: body.observation ?? "",
-        stade_croissance: body.stade_croissance,
-        cycleCultureId,
-      },
-    });
-    return NextResponse.json(releve);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Erreur lors de la modification" }, { status: 500 });
-  }
+export async function GET(_req: Request, contexte: Contexte) {
+  const r = await trouver(contexte);
+  if (r.reponse) return r.reponse;
+  return NextResponse.json(r.releve);
 }
 
-export async function DELETE(request: Request, { params }: Ctx) {
-  try {
-    const user = await getUser();
-    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
+export async function PUT(req: Request, contexte: Contexte) {
+  const r = await trouver(contexte);
+  if (r.reponse) return r.reponse;
 
-    const id = Number((await params).id);
-    if (!(await releveAppartient(id, user.id))) {
-      return NextResponse.json({ error: "Relevé introuvable" }, { status: 404 });
-    }
-
-    const releve = await prisma.releve.delete({ where: { id } });
-    return NextResponse.json(releve);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Erreur lors de la suppression" }, { status: 500 });
+  const corps = await req.json().catch(() => null);
+  if (!corps) {
+    return NextResponse.json({ error: "Données invalides" }, { status: 400 });
   }
+
+  const erreur = validerReleve({
+    cycleCultureId: corps.cycleCultureId,
+    date: corps.date,
+    observation: corps.observation,
+    stade_croissance: corps.stade_croissance,
+  });
+  if (erreur) {
+    return NextResponse.json({ error: erreur }, { status: 400 });
+  }
+
+  const cycle = await prisma.cycleCulture.findFirst({
+    where: { id: corps.cycleCultureId, parcelle: { userId: r.user!.id } },
+  });
+  if (!cycle) {
+    return NextResponse.json({ error: "Cycle introuvable" }, { status: 404 });
+  }
+
+  const releve = await prisma.releve.update({
+    where: { id: r.releve!.id },
+    data: {
+      cycleCultureId: cycle.id,
+      date: new Date(corps.date),
+      observation: String(corps.observation).trim(),
+      stade_croissance: corps.stade_croissance,
+    },
+  });
+
+  return NextResponse.json(releve);
+}
+
+export async function DELETE(_req: Request, contexte: Contexte) {
+  const r = await trouver(contexte);
+  if (r.reponse) return r.reponse;
+
+  await prisma.releve.delete({ where: { id: r.releve!.id } });
+  return NextResponse.json({ ok: true });
 }
