@@ -79,7 +79,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             type="text"
             autoComplete="name"
             className={classeChamp}
-            placeholder="Ahli"
+            placeholder="Votre nom"
             value={nom}
             onChange={(e) => setNom(e.target.value)}
           />
