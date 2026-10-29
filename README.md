@@ -1,30 +1,33 @@
 # AgriMétéo
 
-Application web de suivi de cultures agricoles, intégrant la météo et des conseils automatisés pour les agriculteurs.
+Application web qui aide les agriculteurs à suivre leurs parcelles, leurs cultures et la météo, avec des conseils adaptés à chaque culture et à son stade de croissance.
 
-## Fonctionnalités
+**Site en ligne :** https://agrimeteo-tree.vercel.app
 
-- **Gestion des parcelles** : ajout, modification, suppression, avec géolocalisation (latitude/longitude)
-- **Gestion des cultures** : suivi via des cycles de plantation (`CycleCulture`), liant une culture à une parcelle sur une période donnée
-- **Suivi de croissance** : relevés datés avec stade de développement (germination, floraison, récolte, etc.)
-- **Météo** *(à venir)* : météo actuelle et prévisions par parcelle, via API externe
-- **Conseils agricoles** *(à venir)* : recommandations automatiques générées à partir des données météo
-- **Carte interactive** *(à venir)* : visualisation des parcelles géolocalisées
+![Aperçu du tableau de bord](public/capture.png)
 
-## Stack technique
+## Fonctions
 
-- **Frontend** : Next.js (App Router), React, Tailwind CSS
-- **Backend** : API Routes Next.js
-- **Base de données** : MySQL, avec Prisma ORM
-- **Carte** : react-leaflet *(à venir)*
-- **Déploiement** : Vercel *(à venir)*
+- Inscription, connexion et déconnexion sécurisées
+- Tableau de bord avec la météo actuelle et les prévisions sur 5 jours de chaque parcelle
+- Gestion des parcelles : ajout, modification, suppression, localisation par recherche d'un lieu
+- Gestion des cultures et des cycles de culture (dates de semis et de récolte)
+- Relevés de terrain avec le stade de croissance
+- Conseils générés selon la météo, le type de culture et son stade
+- Chaque utilisateur ne voit que ses propres données
 
-## Modèle de données
+## Technologies
 
-Six entités principales : `Parcelle`, `Culture`, `CycleCulture`, `Relevé`, `Meteo`, `Conseil`.
-Une culture est définie une seule fois et peut être plantée sur différentes parcelles ou périodes via un `CycleCulture`, qui relie `Parcelle` et `Culture`.
+- Next.js 16 (App Router), React 19, TypeScript
+- Tailwind CSS 4
+- Prisma 7 avec MySQL
+- Authentification par jeton JWT (jose) dans un cookie sécurisé, mots de passe hachés avec bcryptjs
+- API OpenWeather pour la météo et la géolocalisation
+- Déploiement : Vercel (application) et Aiven (base MySQL)
 
-## Démarrer le projet en local
+## Installer le projet en local
+
+Prérequis : Node.js 20 ou plus, une base MySQL, une clé OpenWeather gratuite.
 
 ```bash
 git clone https://github.com/JbDev-tech/agrimeteo.git
@@ -32,23 +35,46 @@ cd agrimeteo
 npm install
 ```
 
-Créer un fichier `.env` à la racine avec votre configuration MySQL :
-```
-DATABASE_URL="mysql://root:@localhost:3306/agrimeteo"
+Crée un fichier `.env` à la racine avec ces variables :
+
+```env
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=
+MYSQL_DATABASE=agrimeteo
+DATABASE_URL=mysql://root:@localhost:3306/agrimeteo
+OPENWEATHER_API_KEY=ta_cle_openweather
+AUTH_SECRET=une_longue_valeur_aleatoire
 ```
 
-Puis lancer les migrations et le serveur de développement :
+Pour une base qui exige SSL (comme Aiven), ajoute aussi `MYSQL_CA` avec le texte du certificat.
+
+Crée les tables puis lance l'application :
+
 ```bash
-npx prisma migrate dev
+npx prisma db push
 npm run dev
 ```
 
-L'application est accessible sur [http://localhost:3000](http://localhost:3000).
+L'application tourne sur http://localhost:3000.
 
-## Statut du projet
+## Sécurité
 
-En développement actif — voir `TODO.md` pour le détail des étapes réalisées et à venir.
+- Mots de passe jamais stockés en clair
+- Cookie de session `httpOnly`, `secure` en production
+- Chaque route vérifie que la ressource appartient à l'utilisateur connecté
+- Les clés API et secrets restent côté serveur, hors du dépôt
+
+## Prochaines étapes
+
+- Carte interactive des parcelles
+- Page de profil (changement de nom et de mot de passe, suppression du compte)
+- Réinitialisation du mot de passe par e-mail
+- Notifications d'alertes météo
+- Photos des relevés
+- Limitation des tentatives de connexion
 
 ## Auteur
 
-[JbDev-tech](https://github.com/JbDev-tech)
+Jean-Baptiste (JbDev-tech), développeur web au Togo.
