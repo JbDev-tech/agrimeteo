@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import { getUser } from "@/lib/auth";
@@ -28,6 +29,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         ) : (
           children
         )}
+        <Analytics />
       </body>
     </html>
   );
