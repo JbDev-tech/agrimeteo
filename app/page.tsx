@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth";
+import Apparition from "@/components/Apparition";
 
 export const metadata: Metadata = {
   title: "AgriMétéo : Votre assistant météo et décisionnel agricole",
@@ -29,7 +30,6 @@ function Icone({ chemins, taille = 22 }: { chemins: string[]; taille?: number })
   );
 }
 
-// Icônes personnalisées
 const FEUILLE = [
   "M12 21v-9",
   "M12 12c0-4-3-6-7-6 0 4 3 6 7 6z",
@@ -46,13 +46,6 @@ const GOUTTE = ["M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"];
 const CAHIER = [
   "M8 4h8a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
   "M9 4h6v3H9zM9 12h6M9 16h4",
-];
-
-const TRACTEUR = [
-  "M3 17h18",
-  "M5 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
-  "M17 17a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
-  "M9 11V6h6l3 5",
 ];
 
 const CHECK = ["M20 6L9 17l-5-5"];
@@ -135,32 +128,28 @@ export default async function AccueilPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
-      {/* 🟢 BARRE SUPÉRIEURE / DÉCORATION */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-400" />
-
-      {/* 🟢 EN-TÊTE DE NAVIGATION */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-emerald-100">
+      <header className="sticky top-0 z-50 border-b border-emerald-100 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-4 md:px-10">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-green-700 text-white shadow-md shadow-emerald-600/20 group-hover:scale-105 transition-transform">
+          <Link href="/" className="group flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-600 to-green-700 text-white shadow-md shadow-emerald-600/20 transition-transform group-hover:scale-105 group-hover:-rotate-6">
               <Icone chemins={FEUILLE} taille={24} />
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-black tracking-tight text-emerald-950">AgriMétéo</span>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-600">L'agronomie connectée</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">L'agronomie connectée</span>
             </div>
           </Link>
 
           <nav aria-label="Compte" className="flex items-center gap-2 md:gap-3">
             <Link
               href="/login"
-              className="inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-bold text-emerald-800 hover:bg-emerald-50 transition-colors"
+              className="inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-bold text-emerald-800 transition-colors hover:bg-emerald-50"
             >
               Se connecter
             </Link>
             <Link
               href="/register"
-              className="inline-flex min-h-11 items-center rounded-xl bg-emerald-600 px-5 text-sm font-bold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700 hover:shadow-lg transition-all"
+              className="inline-flex min-h-11 items-center rounded-xl bg-emerald-600 px-5 text-sm font-bold text-white shadow-md shadow-emerald-600/20 transition-all hover:bg-emerald-700 hover:shadow-lg"
             >
               Créer un compte
             </Link>
@@ -169,129 +158,135 @@ export default async function AccueilPage() {
       </header>
 
       <main className="flex-1">
-        {/* 🟢 SECTION HERO */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-emerald-50/60 via-white to-slate-50 py-16 md:py-24">
-          {/* Formes décoratives d'arrière-plan */}
-          <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-emerald-200/30 blur-3xl rounded-full -z-10 pointer-events-none" />
+        <section className="relative overflow-hidden bg-linear-to-b from-emerald-50/60 via-white to-slate-50 py-16 md:py-24">
+          <div className="pointer-events-none absolute left-1/2 top-10 -z-10 h-87.5 w-200 -translate-x-1/2 rounded-full bg-emerald-200/30 blur-3xl" />
 
-          <div className="mx-auto flex w-full max-w-7xl flex-col lg:flex-row items-center gap-12 px-5 md:px-10">
-            {/* Texte & Appel à l'action */}
+          <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-12 px-5 md:px-10 lg:flex-row">
             <div className="flex min-w-0 flex-1 flex-col items-start gap-6 text-left">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-100/60 px-3.5 py-1.5 text-xs font-semibold text-emerald-800">
-                <span className="flex h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
-                Nouveau : Prévisions agronomiques personnalisées
-              </div>
-
-              <h1 className="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 md:text-6xl">
-                Pilotez vos cultures avec la <span className="text-emerald-600 underline decoration-emerald-300 decoration-wavy">météo exacte</span> de vos champs.
-              </h1>
-
-              <p className="max-w-2xl text-lg leading-relaxed text-slate-600 md:text-xl">
-                AgriMétéo associe prévisions ultra-locales et conseils agronomiques pratiques. Anticipez le temps, optimisez vos travaux aux champs et augmentez la rentabilité de vos récoltes.
-              </p>
-
-              <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3 pt-2">
-                <Link
-                  href="/register"
-                  className="inline-flex min-h-13 items-center justify-center rounded-2xl bg-emerald-600 px-8 text-base font-bold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-700 hover:shadow-xl hover:-translate-y-0.5 transition-all"
-                >
-                  Démarrer gratuitement
-                </Link>
-                <Link
-                  href="/login"
-                  className="inline-flex min-h-13 items-center justify-center rounded-2xl border-2 border-slate-200 bg-white px-7 text-base font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all"
-                >
-                  Accéder à mon espace
-                </Link>
-              </div>
-
-              {/* Indicateurs de confiance */}
-              <div className="grid grid-cols-3 gap-6 pt-6 border-t border-slate-200/80 w-full max-w-lg">
-                <div>
-                  <p className="text-2xl font-black text-emerald-700">100%</p>
-                  <p className="text-xs font-medium text-slate-500">Gratuit & Facile</p>
+              <Apparition delai={0}>
+                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-100/60 px-3.5 py-1.5 text-xs font-semibold text-emerald-800">
+                  <span className="flex h-2 w-2 animate-pulse rounded-full bg-emerald-600" />
+                  Nouveau : Prévisions agronomiques personnalisées
                 </div>
-                <div>
-                  <p className="text-2xl font-black text-emerald-700">5 Jours</p>
-                  <p className="text-xs font-medium text-slate-500">Anticipation Météo</p>
+              </Apparition>
+
+              <Apparition delai={120}>
+                <h1 className="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 md:text-6xl">
+                  Pilotez vos cultures avec la{" "}
+                  <span className="text-emerald-600 underline decoration-emerald-300 decoration-wavy">météo exacte</span>{" "}
+                  de vos champs.
+                </h1>
+              </Apparition>
+
+              <Apparition delai={240}>
+                <p className="max-w-2xl text-lg leading-relaxed text-slate-600 md:text-xl">
+                  AgriMétéo associe prévisions ultra-locales et conseils agronomiques pratiques. Anticipez le temps, optimisez vos travaux aux champs et augmentez la rentabilité de vos récoltes.
+                </p>
+              </Apparition>
+
+              <Apparition delai={360} className="w-full sm:w-auto">
+                <div className="flex w-full flex-col gap-3 pt-2 sm:w-auto sm:flex-row">
+                  <Link
+                    href="/register"
+                    className="inline-flex min-h-13 items-center justify-center rounded-2xl bg-emerald-600 px-8 text-base font-bold text-white shadow-lg shadow-emerald-600/30 transition-all hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-xl"
+                  >
+                    Démarrer gratuitement
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="inline-flex min-h-13 items-center justify-center rounded-2xl border-2 border-slate-200 bg-white px-7 text-base font-bold text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
+                  >
+                    Accéder à mon espace
+                  </Link>
                 </div>
-                <div>
-                  <p className="text-2xl font-black text-emerald-700">Sur-mesure</p>
-                  <p className="text-xs font-medium text-slate-500">Par type de culture</p>
+              </Apparition>
+
+              <Apparition delai={480} className="w-full max-w-lg">
+                <div className="grid w-full grid-cols-3 gap-6 border-t border-slate-200/80 pt-6">
+                  <div>
+                    <p className="text-2xl font-black text-emerald-700">100%</p>
+                    <p className="text-xs font-medium text-slate-500">Gratuit & Facile</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-black text-emerald-700">5 Jours</p>
+                    <p className="text-xs font-medium text-slate-500">Anticipation Météo</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-black text-emerald-700">Sur-mesure</p>
+                    <p className="text-xs font-medium text-slate-500">Par type de culture</p>
+                  </div>
                 </div>
-              </div>
+              </Apparition>
             </div>
 
-            {/* DÉMO / CARTE DE SIMULATION VISUELLE */}
-            <div className="flex min-w-0 flex-1 justify-center w-full max-w-md lg:max-w-none">
-              <div className="relative w-full max-w-md rounded-3xl border border-emerald-100 bg-white/90 p-6 shadow-2xl shadow-emerald-900/10 backdrop-blur-md">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="h-3 w-3 rounded-full bg-emerald-500" />
-                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Aperçu en direct</p>
+            <div className="flex w-full max-w-md min-w-0 flex-1 justify-center lg:max-w-none">
+              <Apparition delai={300} className="w-full max-w-md">
+                <div className="animate-flottement relative w-full rounded-3xl border border-emerald-100 bg-white/90 p-6 shadow-2xl shadow-emerald-900/10 backdrop-blur-md">
+                  <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div className="flex items-center gap-2">
+                      <span className="h-3 w-3 animate-pulse rounded-full bg-emerald-500" />
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Aperçu en direct</p>
+                    </div>
+                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Parcelle active</span>
                   </div>
-                  <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Parcelle active</span>
-                </div>
 
-                {/* Carte Météo Principale */}
-                <div className="flex flex-col gap-4 rounded-2xl bg-gradient-to-br from-emerald-900 via-slate-900 to-emerald-950 p-6 text-white shadow-inner">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="rounded-lg bg-emerald-600/80 backdrop-blur-md px-3 py-1 text-xs font-bold">
-                      🌽 Parcelle Nord — Maïs
+                  <div className="flex flex-col gap-4 rounded-2xl bg-linear-to-br from-emerald-900 via-slate-900 to-emerald-950 p-6 text-white shadow-inner">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="rounded-lg bg-emerald-600/80 px-3 py-1 text-xs font-bold backdrop-blur-md">
+                        🌽 Parcelle Nord — Maïs
+                      </span>
+                      <span className="text-xs font-medium text-emerald-200">Lomé, Togo</span>
+                    </div>
+
+                    <div className="flex items-end justify-between py-2">
+                      <div>
+                        <p className="text-5xl font-black tracking-tight">31°C</p>
+                        <p className="mt-1 text-sm text-emerald-200">Sensation : 33°C — Ensoleillé</p>
+                      </div>
+                      <span className="animate-tourner inline-block text-amber-300">
+                        <Icone chemins={METEO} taille={48} />
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 rounded-xl bg-white/10 p-3 text-center text-xs text-emerald-100 backdrop-blur-sm">
+                      <div>
+                        <p className="text-[10px] uppercase text-emerald-300">Humidité</p>
+                        <p className="text-sm font-bold">66 %</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] uppercase text-emerald-300">Vent</p>
+                        <p className="text-sm font-bold">17 km/h</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] uppercase text-emerald-300">Pluie (24h)</p>
+                        <p className="text-sm font-bold">0 mm</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex items-start gap-3.5 rounded-2xl border border-amber-200/60 bg-amber-50/80 p-4 text-amber-900">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-md">
+                      <Icone chemins={["M12 3l10 18H2z", "M12 10v5M12 18v.5"]} taille={20} />
                     </span>
-                    <span className="text-xs text-emerald-200 font-medium">Lomé, Togo</span>
-                  </div>
-
-                  <div className="flex items-end justify-between py-2">
                     <div>
-                      <p className="text-5xl font-black tracking-tight">31°C</p>
-                      <p className="text-sm text-emerald-200 mt-1">Sensation : 33°C — Ensoleillé</p>
-                    </div>
-                    <div className="text-emerald-400">
-                      <Icone chemins={METEO} taille={48} />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 rounded-xl bg-white/10 p-3 text-center text-xs text-emerald-100 backdrop-blur-sm">
-                    <div>
-                      <p className="text-[10px] text-emerald-300 uppercase">Humidité</p>
-                      <p className="font-bold text-sm">66 %</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-emerald-300 uppercase">Vent</p>
-                      <p className="font-bold text-sm">17 km/h</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-emerald-300 uppercase">Pluie (24h)</p>
-                      <p className="font-bold text-sm">0 mm</p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-bold text-amber-950">Conseil d'intervention</p>
+                        <span className="text-[11px] font-semibold text-amber-700">Aujourd'hui</span>
+                      </div>
+                      <p className="mt-1 text-xs leading-relaxed text-amber-900/90">
+                        Pluies torrentielles prévues sous 24h. <strong className="font-semibold">Reportez l'épandage d'engrais</strong> pour éviter le lessivage.
+                      </p>
                     </div>
                   </div>
                 </div>
-
-                {/* Carte d'Alerte & Conseil */}
-                <div className="mt-4 flex items-start gap-3.5 rounded-2xl border border-amber-200/60 bg-amber-50/80 p-4 text-amber-900">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-md">
-                    <Icone chemins={["M12 3l10 18H2z", "M12 10v5M12 18v.5"]} taille={20} />
-                  </span>
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-bold text-amber-950">Conseil d'intervention</p>
-                      <span className="text-[11px] font-semibold text-amber-700">Aujourd'hui</span>
-                    </div>
-                    <p className="mt-1 text-xs leading-relaxed text-amber-900/90">
-                      Pluies torrentielles prévues sous 24h. <strong className="font-semibold">Reportez l'épandage d'engrais</strong> pour éviter le lessivage.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              </Apparition>
             </div>
           </div>
         </section>
 
-        {/* 🟢 SECTION FONCTIONNALITÉS */}
-        <section className="bg-white py-20 border-y border-slate-100">
+        <section className="border-y border-slate-100 bg-white py-20">
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-5 md:px-10">
-            <div className="text-center max-w-2xl mx-auto">
+            <Apparition className="mx-auto max-w-2xl text-center">
               <span className="text-xs font-bold uppercase tracking-widest text-emerald-600">Conçu pour le terrain</span>
               <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
                 Un outil simple et complet pour piloter vos champs
@@ -299,138 +294,145 @@ export default async function AccueilPage() {
               <p className="mt-3 text-base text-slate-600">
                 Des fonctionnalités pensées pour répondre concrètement aux défis quotidiens du monde agricole.
               </p>
-            </div>
+            </Apparition>
 
             <div className="grid gap-8 md:grid-cols-3">
-              {fonctions.map((f) => (
-                <div
-                  key={f.titre}
-                  className="group relative flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-slate-50/50 p-8 hover:bg-white hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-900/5 transition-all"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/20 group-hover:scale-110 transition-transform">
+              {fonctions.map((f, i) => (
+                <Apparition key={f.titre} delai={i * 150} className="h-full">
+                  <div className="group flex h-full flex-col rounded-3xl border border-slate-200/80 bg-slate-50/50 p-8 transition-all hover:border-emerald-300 hover:bg-white hover:shadow-xl hover:shadow-emerald-900/5">
+                    <div className="mb-6 flex items-center justify-between">
+                      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/20 transition-transform group-hover:scale-110 group-hover:-rotate-6">
                         <Icone chemins={f.chemins} taille={28} />
                       </span>
                       <span className="rounded-full bg-emerald-100/70 px-3 py-1 text-xs font-bold text-emerald-800">
                         {f.tag}
                       </span>
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-3">{f.titre}</h3>
+                    <h3 className="mb-3 text-xl font-bold text-slate-900">{f.titre}</h3>
                     <p className="text-sm leading-relaxed text-slate-600">{f.texte}</p>
                   </div>
-                </div>
+                </Apparition>
               ))}
             </div>
           </div>
         </section>
 
-        {/* 🟢 SECTION AVANTAGES AGRONOMIQUS */}
-        <section className="bg-emerald-950 py-20 text-white relative overflow-hidden">
-          <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-emerald-800/20 rounded-full blur-3xl pointer-events-none" />
+        <section className="relative overflow-hidden bg-emerald-950 py-20 text-white">
+          <div className="animate-flottement pointer-events-none absolute -bottom-20 -right-20 h-96 w-96 rounded-full bg-emerald-800/20 blur-3xl" />
 
           <div className="mx-auto max-w-7xl px-5 md:px-10">
             <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
               <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">Impact immédiat</span>
-                <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                  Prenez de meilleures décisions, à chaque étape de la saison.
-                </h2>
-                <p className="mt-4 text-emerald-200/80 text-base leading-relaxed">
-                  L'agriculture moderne exige de la précision. AgriMétéo simplifie la complexité météorologique pour la transformer en décisions claires et rentables.
-                </p>
+                <Apparition>
+                  <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">Impact immédiat</span>
+                  <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
+                    Prenez de meilleures décisions, à chaque étape de la saison.
+                  </h2>
+                  <p className="mt-4 text-base leading-relaxed text-emerald-200/80">
+                    L'agriculture moderne exige de la précision. AgriMétéo simplifie la complexité météorologique pour la transformer en décisions claires et rentables.
+                  </p>
+                </Apparition>
 
                 <div className="mt-8 flex flex-col gap-5">
-                  {avantages.map((item) => (
-                    <div key={item.titre} className="flex gap-4 items-start">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-slate-950 mt-1">
-                        <Icone chemins={CHECK} taille={16} />
+                  {avantages.map((item, i) => (
+                    <Apparition key={item.titre} delai={i * 150}>
+                      <div className="flex items-start gap-4">
+                        <div className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-slate-950">
+                          <Icone chemins={CHECK} taille={16} />
+                        </div>
+                        <div>
+                          <h4 className="text-base font-bold text-white">{item.titre}</h4>
+                          <p className="mt-0.5 text-sm text-emerald-200/70">{item.description}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-bold text-base text-white">{item.titre}</h4>
-                        <p className="text-sm text-emerald-200/70 mt-0.5">{item.description}</p>
-                      </div>
-                    </div>
+                    </Apparition>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-emerald-800/60 bg-emerald-900/40 p-8 backdrop-blur-sm">
-                <h3 className="text-xl font-bold text-white mb-4">Prêt à moderniser la gestion de vos parcelles ?</h3>
-                <p className="text-sm text-emerald-200/80 mb-6 leading-relaxed">
-                  Rejoignez les agriculteurs et producteurs qui utilisent AgriMétéo quotidiennement pour optimiser leurs interventions.
-                </p>
-                <Link
-                  href="/register"
-                  className="block w-full text-center rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 py-4 font-bold text-emerald-950 shadow-lg shadow-emerald-500/20 hover:brightness-110 transition-all"
-                >
-                  Créer un compte gratuitement
-                </Link>
-              </div>
+              <Apparition delai={200}>
+                <div className="rounded-3xl border border-emerald-800/60 bg-emerald-900/40 p-8 backdrop-blur-sm">
+                  <h3 className="mb-4 text-xl font-bold text-white">Prêt à moderniser la gestion de vos parcelles ?</h3>
+                  <p className="mb-6 text-sm leading-relaxed text-emerald-200/80">
+                    Rejoignez les agriculteurs et producteurs qui utilisent AgriMétéo quotidiennement pour optimiser leurs interventions.
+                  </p>
+                  <Link
+                    href="/register"
+                    className="block w-full rounded-2xl bg-linear-to-r from-emerald-500 to-green-500 py-4 text-center font-bold text-emerald-950 shadow-lg shadow-emerald-500/20 transition-all hover:brightness-110"
+                  >
+                    Créer un compte gratuitement
+                  </Link>
+                </div>
+              </Apparition>
             </div>
           </div>
         </section>
 
-        {/* 🟢 SECTION ÉTAPES */}
         <section className="mx-auto w-full max-w-7xl px-5 py-20 md:px-10">
-          <div className="text-center max-w-2xl mx-auto mb-14">
+          <Apparition className="mx-auto mb-14 max-w-2xl text-center">
             <span className="text-xs font-bold uppercase tracking-widest text-emerald-600">Simplicité d'utilisation</span>
             <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
               Prêt en 3 minutes chrono
             </h2>
             <p className="mt-2 text-slate-600">Aucun équipement complexe à installer dans vos champs.</p>
-          </div>
+          </Apparition>
 
           <div className="grid gap-8 md:grid-cols-3">
-            {etapes.map((e) => (
-              <div key={e.titre} className="relative flex flex-col rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-                <span className="text-4xl font-black text-emerald-600/30 mb-4">{e.numero}</span>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{e.titre}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{e.texte}</p>
-              </div>
+            {etapes.map((e, i) => (
+              <Apparition key={e.titre} delai={i * 150} className="h-full">
+                <div className="flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:border-emerald-300 hover:shadow-lg">
+                  <span className="mb-4 text-4xl font-black text-emerald-600/30">{e.numero}</span>
+                  <h3 className="mb-2 text-xl font-bold text-slate-900">{e.titre}</h3>
+                  <p className="text-sm leading-relaxed text-slate-600">{e.texte}</p>
+                </div>
+              </Apparition>
             ))}
           </div>
         </section>
 
-        {/* 🟢 SECTION FAQ */}
         <section className="bg-slate-100/70 py-16">
           <div className="mx-auto max-w-4xl px-5 md:px-10">
-            <h2 className="text-2xl font-extrabold text-center text-slate-900 mb-10">Questions fréquentes</h2>
+            <Apparition>
+              <h2 className="mb-10 text-center text-2xl font-extrabold text-slate-900">Questions fréquentes</h2>
+            </Apparition>
             <div className="grid gap-6">
-              {faqs.map((faq) => (
-                <div key={faq.q} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <h3 className="font-bold text-slate-900 text-base">{faq.q}</h3>
-                  <p className="mt-2 text-sm text-slate-600 leading-relaxed">{faq.r}</p>
-                </div>
+              {faqs.map((faq, i) => (
+                <Apparition key={faq.q} delai={i * 120}>
+                  <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+                    <h3 className="text-base font-bold text-slate-900">{faq.q}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{faq.r}</p>
+                  </div>
+                </Apparition>
               ))}
             </div>
           </div>
         </section>
 
-        {/* 🟢 BANNIÈRE D'APPEL À L'ACTION FINAL */}
         <section className="mx-auto w-full max-w-7xl px-5 py-16 md:px-10">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-700 via-green-700 to-emerald-800 p-8 text-white shadow-2xl md:p-14">
-            <div className="relative z-10 max-w-2xl">
-              <h2 className="text-3xl font-black tracking-tight md:text-4xl">
-                Inscrivez votre première parcelle dès aujourd'hui
-              </h2>
-              <p className="mt-4 text-emerald-100 text-base leading-relaxed">
-                Rejoignez la communauté d'agriculteurs connectés. L'inscription prend moins d'une minute.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Link
-                  href="/register"
-                  className="inline-flex min-h-13 items-center rounded-2xl bg-white px-8 text-base font-bold text-emerald-900 shadow-md hover:bg-emerald-50 transition-all"
-                >
-                  Créer un compte gratuit
-                </Link>
+          <Apparition>
+            <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-emerald-700 via-green-700 to-emerald-800 p-8 text-white shadow-2xl md:p-14">
+              <div className="animate-flottement pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
+              <div className="relative z-10 max-w-2xl">
+                <h2 className="text-3xl font-black tracking-tight md:text-4xl">
+                  Inscrivez votre première parcelle dès aujourd'hui
+                </h2>
+                <p className="mt-4 text-base leading-relaxed text-emerald-100">
+                  Rejoignez la communauté d'agriculteurs connectés. L'inscription prend moins d'une minute.
+                </p>
+                <div className="mt-8 flex flex-wrap gap-4">
+                  <Link
+                    href="/register"
+                    className="inline-flex min-h-13 items-center rounded-2xl bg-white px-8 text-base font-bold text-emerald-900 shadow-md transition-all hover:-translate-y-0.5 hover:bg-emerald-50"
+                  >
+                    Créer un compte gratuit
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
+          </Apparition>
         </section>
       </main>
 
-      {/* 🟢 PIED DE PAGE */}
       <footer className="border-t border-slate-200 bg-white py-10">
         <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 px-5 text-center sm:flex-row sm:text-left md:px-10">
           <div className="flex items-center gap-2">

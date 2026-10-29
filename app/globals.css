@@ -25,3 +25,41 @@ body {
     color: var(--color-encre);
     font-family: var(--font-sans);
 }
+
+@keyframes flottement {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+@keyframes tourner {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-flottement {
+    animation: flottement 6s ease-in-out infinite;
+}
+
+.animate-tourner {
+    animation: tourner 24s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .animate-flottement,
+    .animate-tourner {
+        animation: none;
+    }
+}
